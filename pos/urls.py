@@ -1,7 +1,7 @@
-from rest_framework.routers import DefaultRouter
-from .views import VentaViewSet
+from django.urls import path
+from . import views
 
-router = DefaultRouter()
-router.register(r'ventas', VentaViewSet)
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('ventas/', views.lista_ventas, name='lista_ventas'),
+    path('ventas/<int:pk>/', views.detalle_venta, name='detalle_venta'),
+]
