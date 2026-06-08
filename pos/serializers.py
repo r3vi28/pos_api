@@ -19,7 +19,6 @@ class VentaSerializer(serializers.ModelSerializer):
         model = Venta
         fields = ['id', 'cliente', 'atendido_por', 'fecha', 'descuento', 'total', 'detalles']
 
-
 class VentaSerializerReg(serializers.ModelSerializer):
     detalles = DetalleVentaSerializerReg(many=True, write_only=True)
 
@@ -33,38 +32,35 @@ class VentaSerializerReg(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        from django.db import transaction
         detalles_data = validated_data.pop('detalles')
 
-        with transaction.atomic():
-            total = 0
-            for detalle in detalles_data:
-                producto = detalle['producto']
-                cantidad = detalle['cantidad']
-                total += producto.precio * cantidad
+        total = 0
+        for detalle in detalles_data:
+            producto = detalle['producto']
+            cantidad = detalle['cantidad']
+            total += producto.precio * cantidad
 
-            descuento = validated_data.get('descuento', 0)
-            total -= descuento
+        descuento = validated_data.get('descuento', 0)
+        total -= descuento
 
-            venta = Venta.objects.create(**validated_data, total=total)
+        venta = Venta.objects.create(**validated_data, total=total)
 
-            for detalle in detalles_data:
-                producto = detalle['producto']
-                cantidad = detalle['cantidad']
-                precio_unitario = producto.precio
-                subtotal = precio_unitario * cantidad
+        for detalle in detalles_data:
+            producto = detalle['producto']
+            cantidad = detalle['cantidad']
+            precio_unitario = producto.precio
+            subtotal = precio_unitario * cantidad
 
-                DetalleVenta.objects.create(
-                    venta=venta,
-                    producto=producto,
-                    cantidad=cantidad,
-                    precio_unitario=precio_unitario,
-                    subtotal=subtotal
-                )
+            DetalleVenta.objects.create(
+                venta=venta,
+                producto=producto,
+                cantidad=cantidad,
+                precio_unitario=precio_unitario,
+                subtotal=subtotal
+            )
 
         return venta
-
-
+    
 class VentaSerializerUpdate(serializers.ModelSerializer):
     class Meta:
         model = Venta

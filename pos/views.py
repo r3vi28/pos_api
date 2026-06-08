@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Venta
 from .serializers import VentaSerializer, VentaSerializerReg, VentaSerializerUpdate
-
+from django.db import transaction
 
 @api_view(['GET', 'POST'])
 def lista_ventas(request):
@@ -19,8 +19,10 @@ def lista_ventas(request):
     if request.method == 'POST':
         serializer = VentaSerializerReg(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            with transaction.atomic():
+                venta = serializer.save()
+            response_serializer = VentaSerializer(venta)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
