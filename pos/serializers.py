@@ -32,11 +32,29 @@ class VentaSerializerReg(serializers.ModelSerializer):
         fields = ['cliente', 'atendido_por', 'descuento', 'detalles']
 
     def validate(self, data):
+        """Validaciones de negocio antes de crear la venta."""
         if not data.get('detalles'):
             raise serializers.ValidationError("La venta debe tener al menos un detalle.")
+
+        detalles_data = data.get('detalles')
+        total = 0
+        for detalle in detalles_data:
+            producto = detalle['producto']
+            cantidad = detalle['cantidad']
+            total += producto.precio * cantidad
+
+        descuento = data.get('descuento', 0)
+        if descuento > total:
+            raise serializers.ValidationError(
+                f"El descuento (${descuento}) no puede ser mayor al total (${total})."
+            )
+
         return data
 
     def create(self, validated_data):
+        """
+        Crea la venta y sus detalles. El total ya fue validado en validate().
+        """
         detalles_data = validated_data.pop('detalles')
 
         total = 0
