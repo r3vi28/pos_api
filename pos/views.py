@@ -1,13 +1,15 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Venta, Producto
+from .models import Venta, Producto, Cliente
 from .serializers import (
     VentaSerializer, VentaSerializerReg, VentaSerializerUpdate,
-    ProductoSerializer, ProductoSerializerReg, ProductoSerializerUpdate
+    ProductoSerializer, ProductoSerializerReg, ProductoSerializerUpdate,
+    ClienteSerializer, ClienteSerializerReg, ClienteSerializerUpdate
 )
 from django.db import transaction
 
+# VENTAS
 @api_view(['GET', 'POST'])
 def lista_ventas(request):
     """
@@ -60,6 +62,7 @@ def detalle_venta(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# PRODUCTOS
 @api_view(['GET', 'POST'])
 def lista_productos(request):
     """
@@ -110,4 +113,58 @@ def detalle_producto(request, pk):
 
     if request.method == 'DELETE':
         producto.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+# CLIENTES
+@api_view(['GET', 'POST'])
+def lista_clientes(request):
+    """
+    GET  /api/clientes/ → retorna todos los clientes.
+    POST /api/clientes/ → crea un nuevo cliente.
+    """
+    if request.method == 'GET':
+        clientes = Cliente.objects.all()
+        serializer = ClienteSerializer(clientes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    if request.method == 'POST':
+        serializer = ClienteSerializerReg(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            cliente = serializer.instance
+            response_serializer = ClienteSerializer(cliente)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def detalle_cliente(request, pk):
+    """
+    GET    /api/clientes/{id}/ → retorna un cliente específico.
+    PUT    /api/clientes/{id}/ → actualiza un cliente.
+    DELETE /api/clientes/{id}/ → elimina un cliente.
+    """
+    try:
+        cliente = Cliente.objects.get(pk=pk)
+    except Cliente.DoesNotExist:
+        return Response(
+            {'error': 'Cliente no encontrado.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    if request.method == 'GET':
+        serializer = ClienteSerializer(cliente)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    if request.method == 'PUT':
+        serializer = ClienteSerializerUpdate(cliente, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_serializer = ClienteSerializer(cliente)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == 'DELETE':
+        cliente.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

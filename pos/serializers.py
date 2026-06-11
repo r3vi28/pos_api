@@ -108,3 +108,45 @@ class ProductoSerializerUpdate(serializers.ModelSerializer):
         if not data.get('have_code') and data.get('codigo_barra'):
             raise serializers.ValidationError("No puede tener codigo de barra cuando have_code es False.")
         return data
+    
+
+# CLIENTE
+# Serializador de lectura para consultar información de clientes.
+class ClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = ['id', 'nombre', 'apellido', 'have_rnc', 'rnc', 'email', 'telefono', 'direccion']
+
+# Serializador utilizado para registrar clientes con sus validaciones.
+class ClienteSerializerReg(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = ['nombre', 'apellido', 'have_rnc', 'rnc', 'email', 'telefono', 'direccion']
+
+    def validate(self, data):
+        if data.get('have_rnc') and not data.get('rnc'):
+            raise serializers.ValidationError("El RNC es requerido cuando have_rnc es True.")
+        if not data.get('have_rnc') and data.get('rnc'):
+            raise serializers.ValidationError("No puede tener RNC cuando have_rnc es False.")
+        if data.get('rnc'):
+            rnc = data.get('rnc').replace('-', '').strip()
+            if not rnc.isdigit() or len(rnc) not in [9, 11]:
+                raise serializers.ValidationError("El RNC debe tener 9 u 11 dígitos numéricos.")
+        return data
+
+# Serializador utilizado para actualizar clientes con sus validaciones.
+class ClienteSerializerUpdate(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = ['nombre', 'apellido', 'have_rnc', 'rnc', 'email', 'telefono', 'direccion']
+
+    def validate(self, data):
+        if data.get('have_rnc') and not data.get('rnc'):
+            raise serializers.ValidationError("El RNC es requerido cuando have_rnc es True.")
+        if not data.get('have_rnc') and data.get('rnc'):
+            raise serializers.ValidationError("No puede tener RNC cuando have_rnc es False.")
+        if data.get('rnc'):
+            rnc = data.get('rnc').replace('-', '').strip()
+            if not rnc.isdigit() or len(rnc) not in [9, 11]:
+                raise serializers.ValidationError("El RNC debe tener 9 u 11 dígitos numéricos.")
+        return data
