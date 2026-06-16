@@ -8,6 +8,7 @@ from .serializers import (
 )
 from django.db import transaction
 from .services.response import Result, TryCatch
+from .services.pagination import Paginar
 
 
 # VENTAS
@@ -15,9 +16,8 @@ from .services.response import Result, TryCatch
 def lista_ventas(request):
     if request.method == 'GET':
         def action():
-            ventas = Venta.objects.all()
-            serializer = VentaSerializer(ventas, many=True)
-            return Result.Exitosa('', serializer.data, status.HTTP_200_OK)
+            ventas = Venta.objects.all().order_by('-id')
+            return Paginar(ventas, VentaSerializer, request)
         return TryCatch(action)
 
     if request.method == 'POST':
@@ -64,9 +64,8 @@ def detalle_venta(request, pk):
 def lista_productos(request):
     if request.method == 'GET':
         def action():
-            productos = Producto.objects.all()
-            serializer = ProductoSerializer(productos, many=True)
-            return Result.Exitosa('', serializer.data, status.HTTP_200_OK)
+            productos = Producto.objects.all().order_by('-id')
+            return Paginar(productos, ProductoSerializer, request)
         return TryCatch(action)
 
     if request.method == 'POST':
@@ -113,9 +112,8 @@ def detalle_producto(request, pk):
 def lista_clientes(request):
     if request.method == 'GET':
         def action():
-            clientes = Cliente.objects.all()
-            serializer = ClienteSerializer(clientes, many=True)
-            return Result.Exitosa('', serializer.data, status.HTTP_200_OK)
+            clientes = Cliente.objects.all().order_by('-id')
+            return Paginar(clientes, ClienteSerializer, request)
         return TryCatch(action)
 
     if request.method == 'POST':
