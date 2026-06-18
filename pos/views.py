@@ -9,9 +9,35 @@ from .serializers import (
 from django.db import transaction
 from .services.response import Result, TryCatch
 from .services.pagination import Paginar
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+page_param = openapi.Parameter(
+    'page', openapi.IN_QUERY,
+    description="Número de página a consultar (por defecto 1).",
+    type=openapi.TYPE_INTEGER
+)
+
+pagesize_param = openapi.Parameter(
+    'pagesize', openapi.IN_QUERY,
+    description="Cantidad de resultados por página (por defecto 10).",
+    type=openapi.TYPE_INTEGER
+)
 
 
 # VENTAS
+@swagger_auto_schema(
+    method='get',
+    operation_description="Lista todas las ventas de forma paginada.",
+    manual_parameters=[page_param, pagesize_param],
+    responses={200: 'Exitoso'}
+)
+@swagger_auto_schema(
+    method='post',
+    operation_description="Registra una nueva venta con sus detalles anidados.",
+    request_body=VentaSerializerReg,
+    responses={201: 'Creado', 400: 'Error de validación'}
+)
 @api_view(['GET', 'POST'])
 def lista_ventas(request):
     if request.method == 'GET':
@@ -32,6 +58,22 @@ def lista_ventas(request):
         return TryCatch(action)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Obtiene un cliente específico por su ID.",
+    responses={200: 'Exitoso', 400: 'No encontrado'}
+)
+@swagger_auto_schema(
+    method='put',
+    operation_description="Actualiza un cliente existente.",
+    request_body=ClienteSerializerUpdate,
+    responses={200: 'Actualizado', 400: 'Error de validación'}
+)
+@swagger_auto_schema(
+    method='delete',
+    operation_description="Elimina un cliente.",
+    responses={200: 'Eliminado', 400: 'No encontrado'}
+)
 @api_view(['GET', 'PUT', 'DELETE'])
 def detalle_venta(request, pk):
     def action():
@@ -60,6 +102,18 @@ def detalle_venta(request, pk):
 
 
 # PRODUCTOS
+@swagger_auto_schema(
+    method='get',
+    operation_description="Lista todos los productos de forma paginada.",
+    manual_parameters=[page_param, pagesize_param],
+    responses={200: 'Exitoso'}
+)
+@swagger_auto_schema(
+    method='post',
+    operation_description="Registra un nuevo producto.",
+    request_body=ProductoSerializerReg,
+    responses={201: 'Creado', 400: 'Error de validación'}
+)
 @api_view(['GET', 'POST'])
 def lista_productos(request):
     if request.method == 'GET':
@@ -80,6 +134,22 @@ def lista_productos(request):
         return TryCatch(action)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Obtiene un producto específico por su ID.",
+    responses={200: 'Exitoso', 400: 'No encontrado'}
+)
+@swagger_auto_schema(
+    method='put',
+    operation_description="Actualiza un producto existente.",
+    request_body=ProductoSerializerUpdate,
+    responses={200: 'Actualizado', 400: 'Error de validación'}
+)
+@swagger_auto_schema(
+    method='delete',
+    operation_description="Elimina un producto.",
+    responses={200: 'Eliminado', 400: 'No encontrado'}
+)
 @api_view(['GET', 'PUT', 'DELETE'])
 def detalle_producto(request, pk):
     def action():
@@ -108,6 +178,18 @@ def detalle_producto(request, pk):
 
 
 # CLIENTES
+@swagger_auto_schema(
+    method='get',
+    operation_description="Lista todos los clientes de forma paginada.",
+    manual_parameters=[page_param, pagesize_param],
+    responses={200: 'Exitoso'}
+)
+@swagger_auto_schema(
+    method='post',
+    operation_description="Registra un nuevo cliente.",
+    request_body=ClienteSerializerReg,
+    responses={201: 'Creado', 400: 'Error de validación'}
+)
 @api_view(['GET', 'POST'])
 def lista_clientes(request):
     if request.method == 'GET':
@@ -128,6 +210,22 @@ def lista_clientes(request):
         return TryCatch(action)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Obtiene un cliente específico por su ID.",
+    responses={200: 'Exitoso', 400: 'No encontrado'}
+)
+@swagger_auto_schema(
+    method='put',
+    operation_description="Actualiza un cliente existente.",
+    request_body=ClienteSerializerUpdate,
+    responses={200: 'Actualizado', 400: 'Error de validación'}
+)
+@swagger_auto_schema(
+    method='delete',
+    operation_description="Elimina un cliente.",
+    responses={200: 'Eliminado', 400: 'No encontrado'}
+)
 @api_view(['GET', 'PUT', 'DELETE'])
 def detalle_cliente(request, pk):
     def action():
