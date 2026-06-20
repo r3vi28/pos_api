@@ -29,7 +29,7 @@ class VentaSerializerReg(serializers.ModelSerializer):
 
     class Meta:
         model = Venta
-        fields = ['cliente', 'atendido_por', 'descuento', 'detalles']
+        fields = ['cliente', 'descuento', 'detalles']
 
     def validate(self, data):
         """Validaciones de negocio antes de crear la venta."""
@@ -88,7 +88,7 @@ class VentaSerializerReg(serializers.ModelSerializer):
 class VentaSerializerUpdate(serializers.ModelSerializer):
     class Meta:
         model = Venta
-        fields = ['cliente', 'atendido_por', 'descuento']
+        fields = ['cliente', 'descuento']
 
 # PRODUCTO
 # Serializador de lectura para productos.

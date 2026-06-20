@@ -49,10 +49,12 @@ def lista_ventas(request):
 
     if request.method == 'POST':
         def action():
+            if not request.user.is_authenticated:
+                return Result.Error('Debe iniciar sesión para registrar una venta.')
             serializer = VentaSerializerReg(data=request.data)
             if serializer.is_valid():
                 with transaction.atomic():
-                    venta = serializer.save()
+                    venta = serializer.save(atendido_por=request.user)
                 response_serializer = VentaSerializer(venta)
                 return Result.Exitosa('Venta registrada correctamente.', response_serializer.data, status.HTTP_201_CREATED)
             return Result.Error(serializer.errors)
