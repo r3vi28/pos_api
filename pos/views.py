@@ -9,6 +9,7 @@ from .serializers import (
 from django.db import transaction
 from .services.response import Result, TryCatch
 from .services.pagination import Paginar
+from .services.permisos import requiere_admin
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -87,6 +88,9 @@ def detalle_venta(request, pk):
             return Result.Exitosa('', serializer.data, status.HTTP_200_OK)
 
         if request.method == 'PUT':
+            error = requiere_admin(request.user)
+            if error:
+                return error
             serializer = VentaSerializerUpdate(venta, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -95,6 +99,9 @@ def detalle_venta(request, pk):
             return Result.Error(serializer.errors)
 
         if request.method == 'DELETE':
+            error = requiere_admin(request.user)
+            if error:
+                return error
             venta.delete()
             return Result.Exitosa('Venta eliminada correctamente.', {}, status.HTTP_200_OK)
 
@@ -124,6 +131,9 @@ def lista_productos(request):
 
     if request.method == 'POST':
         def action():
+            error = requiere_admin(request.user)
+            if error:
+                return error
             serializer = ProductoSerializerReg(data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -163,6 +173,9 @@ def detalle_producto(request, pk):
             return Result.Exitosa('', serializer.data, status.HTTP_200_OK)
 
         if request.method == 'PUT':
+            error = requiere_admin(request.user)
+            if error:
+                return error
             serializer = ProductoSerializerUpdate(producto, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -171,6 +184,10 @@ def detalle_producto(request, pk):
             return Result.Error(serializer.errors)
 
         if request.method == 'DELETE':
+            error = requiere_admin(request.user)
+            if error:
+                return error
+            producto.delete()
             producto.delete()
             return Result.Exitosa('Producto eliminado correctamente.', {}, status.HTTP_200_OK)
 
@@ -247,6 +264,9 @@ def detalle_cliente(request, pk):
             return Result.Error(serializer.errors)
 
         if request.method == 'DELETE':
+            error = requiere_admin(request.user)
+            if error:
+                return error
             cliente.delete()
             return Result.Exitosa('Cliente eliminado correctamente.', {}, status.HTTP_200_OK)
 
