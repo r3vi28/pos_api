@@ -181,15 +181,14 @@ def detalle_producto(request, pk):
             serializer = ProductoSerializerUpdate(producto, data=request.data)
             if serializer.is_valid():
                 serializer.save()
+                producto.refresh_from_db()
                 response_serializer = ProductoSerializer(producto)
-                return Result.Exitosa('Producto actualizado correctamente.', response_serializer.data, status.HTTP_200_OK)
-            return Result.Error(serializer.errors)
+            return Result.Exitosa('Producto actualizado correctamente.', response_serializer.data, status.HTTP_200_OK)
 
         if request.method == 'DELETE':
             error = requiere_admin(request.user)
             if error:
                 return error
-            producto.delete()
             producto.delete()
             return Result.Exitosa('Producto eliminado correctamente.', {}, status.HTTP_200_OK)
 
